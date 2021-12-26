@@ -1,2 +1,4 @@
 # py4mc
-New year, new api wrapper. Maybe do it a bit better this year
+New year, New wrapper.
+Hopefully this turns into a long time project.
+I hope to wrap everything wiki.vg has to offer.
