@@ -11,9 +11,16 @@ def parse_response(response: requests.Response):
     if response.status_code == requests.codes.ok:
         if is_valid_json(response.content):
             response_json = response.json()
-            if not isinstance(response_json, list) and response_json.get("error") is not None:
-                error_format = f"{response_json.get('error')}: {response_json.get('errorMessage')}"
-                raise ApiException(f"An exception occurred while trying to parse the response: {error_format}")
+            if (
+                not isinstance(response_json, list)
+                and response_json.get("error") is not None
+            ):
+                error_format = (
+                    f"{response_json.get('error')}: {response_json.get('errorMessage')}"
+                )
+                raise ApiException(
+                    f"An exception occurred while trying to parse the response: {error_format}"
+                )
             return response_json
         else:
             return response
@@ -25,16 +32,12 @@ class Dispatch:
     API_BASE = "https://api.mojang.com"
     SESSION_SERVER = "https://sessionserver.mojang.com"
 
-    def __init__(self, jwt_token: str = None):
-        self.jwt_token = jwt_token
-        if jwt_token is not None:
-            self._auth = {
-                "Authorization": f"Bearer {jwt_token}",
-                "Content-Type": "application/json",
-            }
-
     @classmethod
     def do_request(cls, method: str, route: str, **kwargs):
+        if kwargs.get("headers") is None:
+            kwargs["headers"] = {"Content-Type": "application/json"}
+        else:
+            kwargs["headers"].update({"Content-Type": "application/json"})
         response = requests.request(method, route, **kwargs)
         parsed_response = parse_response(response)
         return parsed_response
