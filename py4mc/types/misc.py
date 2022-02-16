@@ -1,4 +1,12 @@
 class Statistics:
+    """Statistics from the Mojang API.
+
+    Three values are present when a statistics response is recieved from the API, the total amount of copies sold, the total amount of copies sold in 24 hours, and the sale velocity in seconds.
+
+    Attributes:
+        raw_data (dict): The raw json response recieved from the API.
+
+    """
 
     VALID_METRICS = [
         "item_sold_minecraft",
@@ -10,6 +18,7 @@ class Statistics:
     ]
 
     def __init__(self, raw_data: dict):
+        # Rather than using self.__dict__.update(raw_data), I decided to convert the attributes to snake_case.
         self.total = raw_data.get("total")
         self.last_24h = raw_data.get("last24h")
         self.sale_velocity = raw_data.get("saleVelocityPerSeconds")
