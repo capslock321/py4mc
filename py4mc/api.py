@@ -25,6 +25,7 @@ SOFTWARE.
 """
 
 import hashlib
+import requests
 
 from typing import Union
 from collections.abc import Iterable
@@ -43,10 +44,11 @@ class MojangApi:
     Anything regarding Mojang's API that is documented in wiki.vg, has been implemented in some sort in this library.
     """
 
-    def _get_profile_information(self, uuid: str):
+    def get_profile_attributes(self, uuid: str):
         """Retrieves the profile information given the users UUID.
 
-        Instead of making multiple requests to retrieve the relevant profile attributes, we make only one request to get all of the relevant profile attributes.
+        Instead of making multiple requests to retrieve the relevant profile attributes,
+        we make only one request to get all of the relevant profile attributes.
 
         Args:
             uuid (UUID): The profile's UUID.
@@ -62,42 +64,56 @@ class MojangApi:
         properties = profile.get("properties")[0]
         return Profile(properties.get("value"), properties.get("signature"))
 
-    def _chunk_profiles(self, profiles, chunk_size: int = 10):
+    def _chunk_usernames(self, usernames, chunk_size: int = 10):
         """Splits the given profiles into multiple lists.
 
         This chunks a large list, into smaller lists so more than 10 names can be provided into the get_profile method.
 
         Args:
-            profiles (Iterable): The large profile list to chunk.
+            usernames (Iterable): The large profile list to chunk.
             chunk_size (int): The size each chunked list.
 
         Yields:
             list: The chunked list.
 
         """
-        for iteration in range(0, len(profiles), chunk_size):
-            yield profiles[iteration : iteration + chunk_size]
+        for iteration in range(0, len(usernames), chunk_size):
+            yield usernames[iteration: iteration + chunk_size]
 
-    def _get_uuids(self, profiles: Iterable):
+    def get_uuid(self, username: str) -> str:
+        route = Dispatch.API_BASE + "/users/profiles/minecraft/"
+        response = Dispatch.do_request("GET", route + username)
+        return response.get("id")
+
+    def get_uuids(self, usernames: Iterable) -> str:
         """Attempts to get all UUIDS of the given profiles.
 
-        Because the API can only take 10 names per request, we can chunk a list larger than 10 names so instead of having to discard any names past the first ten, we can return to the user all their requested names, albeit a little slower.
+        Because the API can only take 10 names per request, we can chunk a list larger than 10 names so
+        instead of having to discard any names past the first ten, we can return to the user all of
+        their requested names, albeit a little slower.
 
         Args:
-            profiles (Iterable): An iterable of names.
+            usernames (Iterable): An iterable of names.
 
         Returns:
             list: The UUID's associated with each name.
 
         """
         processed_uuids = []
-        chunked_profiles = list(self._chunk_profiles(profiles))
+        chunked_profiles = list(self._chunk_usernames(usernames))
         route = Dispatch.API_BASE + "/profiles/minecraft"
         for profile_chunk in chunked_profiles:
             chunk = [c for c in profile_chunk if is_valid_name(c)]
             response = Dispatch.do_request("POST", route, json=chunk)
             processed_uuids.extend([r.get("id") for r in response])
         return processed_uuids
+
+    def _postprocess_profiles(self, profiles: Union[str, Iterable]) -> Union[Profile, list, bool]:
+        if not profiles:
+            return None
+        elif len(profiles) == 1:
+            return profiles[0]
+        return profiles
 
     def get_user(self, profiles: Union[str, Iterable]):
         """Gets the specified profiles attributes.
@@ -113,16 +129,21 @@ class MojangApi:
         Returns:
             Union[Profile, list]: The retrieved profiles.
         """
+        # Note to self, code here is messy af. Change.
+        # No more list comprehension. we go expanded
+        # We check if it is already a valid id.
+        # If it is, then we skip and go straight to processing
+        # else we get the name and process
         retrieved_profiles = []
-        profile_uuids = self._get_uuids([p for p in profiles if is_valid_uuid(p)])
-        for profile_uuid in set(profile_uuids):
-            print(profile_uuid)
-            profile_data = self._get_profile_information(profile_uuid)
-            if profile_data is not None:
-                retrieved_profiles.append(profile_data)
-        if len(retrieved_profiles) == 1:  # If we have more than one returned profiles, we return it in a Profile object, rather than a list of Profile objects.
-            return retrieved_profiles[0]
-        return retrieved_profiles
+        if isinstance(profiles, str):
+            profiles = [profiles, ]
+        for profile in profiles:
+            if not is_valid_uuid(profile):
+                profile = self.get_uuid(profile)
+            profile_data = self.get_profile_attributes(profile)
+            retrieved_profiles.append(profile_data)
+        return self._postprocess_profiles(retrieved_profiles)
+
 
     def get_blocked_servers(self, raw_hashes: bool = True):
         """Retrieves a list of blocked servers.
@@ -137,7 +158,7 @@ class MojangApi:
         """
         blocked_servers = []
         route = Dispatch.SESSION_SERVER + "/blockedservers"
-        response = Dispatch.do_request("GET", route)
+        response = requests.request("GET", route)
         for blocked_hash in response.content.splitlines():
             if not raw_hashes:
                 server_hash = hashlib.sha1(blocked_hash)

@@ -1,5 +1,6 @@
 from ..dispatcher import Dispatch
 
+
 class _Texture:
     def __init__(self, texture_url: str):
         self.texture = self._texture_bytes(texture_url)

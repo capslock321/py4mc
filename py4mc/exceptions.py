@@ -17,5 +17,6 @@ class UserNotFound(ApiException):
 class Ratelimited(ApiException):
     pass
 
+
 class InvalidMetric(ApiException):
     pass
