@@ -33,7 +33,7 @@ class Profile:
         self.profile = self._process_value(profile_value)
         self.uuid = UUID(self.profile.get("profileId"), version=4)
         self.username = self.profile.get("profileName")
-        self.timestamp = self.get_timestamp(self.profile)
+        self.timestamp = self.get_timestamp()
         self.signature = signature
 
     def __str__(self):
