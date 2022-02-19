@@ -28,6 +28,7 @@ import hashlib
 import requests
 
 from typing import Union
+from requests import Response
 from collections.abc import Iterable
 
 from .exceptions import ApiException, InvalidMetric
@@ -80,9 +81,21 @@ class MojangApi:
         for iteration in range(0, len(usernames), chunk_size):
             yield usernames[iteration: iteration + chunk_size]
 
-    def get_uuid(self, username: str) -> str:
+    def get_uuid(self, username: str) -> Union[bool, str]:
+        """Gets the uuid of the given username.
+
+        Args:
+            username: The username to get the uuid of.
+
+        Returns:
+            bool: Returns None if no person with that name is found.
+            str: The uuid of the username given.
+
+        """
         route = Dispatch.API_BASE + "/users/profiles/minecraft/"
         response = Dispatch.do_request("GET", route + username)
+        if isinstance(response, Response):
+            return None
         return response.get("id")
 
     def get_uuids(self, usernames: Iterable) -> str:
@@ -109,6 +122,21 @@ class MojangApi:
         return processed_uuids
 
     def _postprocess_profiles(self, profiles: Union[str, Iterable]) -> Union[Profile, list, bool]:
+        """Processes the profiles before returning.
+
+        If there are no profiles, then None is returned. However, if
+        there is only one profile in the list, then we return the singular
+        Profile object within that list. Else we just return the list.
+
+        Args:
+            profiles: The list of profiles to process.
+
+        Returns:
+            Profile: If there is only a singular profile in the list.
+            list: If there are multiple profiles in the list.
+            bool: If there are no elements in the list.
+
+        """
         if not profiles:
             return None
         elif len(profiles) == 1:
@@ -118,7 +146,7 @@ class MojangApi:
     def get_user(self, profiles: Union[str, Iterable]):
         """Gets the specified profiles attributes.
 
-        The argument can be either a single string, or an iterable of strings. We do not use the /users/profiles/minecraft/<username> endpoint to avoid unessecary code bloat, as the multiple user endpoint is significantly more useful to us, and can also take only one profile.
+        The argument can be either a single string, or an iterable of strings.
 
         Note:
             No user can have a valid Minecraft UUID as a username, therefore we exclude the uuids from getting checked to speed up the profile gathering process.
@@ -129,11 +157,6 @@ class MojangApi:
         Returns:
             Union[Profile, list]: The retrieved profiles.
         """
-        # Note to self, code here is messy af. Change.
-        # No more list comprehension. we go expanded
-        # We check if it is already a valid id.
-        # If it is, then we skip and go straight to processing
-        # else we get the name and process
         retrieved_profiles = []
         if isinstance(profiles, str):
             profiles = [profiles, ]

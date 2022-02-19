@@ -38,9 +38,9 @@ for profile in profiles:
     print(f"UUID: {profile.uuid} | Name: {profile.username}")
     print(f"Name History:\n {profile.name_history()}")"""
 
-print(mojang.get_user("capslock321"))
+print(mojang.get_user("dasfdasfasdasfasdgad"))
 
-print(mojang.get_user("capslock321").signature)
+print(mojang.get_user("capslock321"))
 
 print(mojang.get_user("Hypermnesia").default_skin())
 

@@ -1,7 +1,9 @@
 class Statistics:
     """Statistics from the Mojang API.
 
-    Three values are present when a statistics response is recieved from the API, the total amount of copies sold, the total amount of copies sold in 24 hours, and the sale velocity in seconds.
+    Three values are present when a statistics response is recieved from the API,\
+    the total amount of copies sold, the total amount of copies sold in 24 hours,
+    and the sale velocity in seconds.
 
     Attributes:
         raw_data (dict): The raw json response recieved from the API.
