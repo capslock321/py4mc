@@ -148,8 +148,9 @@ class MojangApi:
 
         The argument can be either a single string, or an iterable of strings.
 
-        Note:
-            No user can have a valid Minecraft UUID as a username, therefore we exclude the uuids from getting checked to speed up the profile gathering process.
+        Notes:
+            No user can have a valid Minecraft UUID as a username,
+            therefore we exclude the uuids from getting checked to speed up the profile gathering process.
 
         Args:
             profiles (Union[str, Iterable]): The profiles to retrieve from the API.
@@ -167,11 +168,11 @@ class MojangApi:
             retrieved_profiles.append(profile_data)
         return self._postprocess_profiles(retrieved_profiles)
 
-
     def get_blocked_servers(self, raw_hashes: bool = True):
         """Retrieves a list of blocked servers.
 
-        Upon connecting to a server, the client will check if the hashed server IP is within this list. If it is, then it will not connect to that server.
+        Upon connecting to a server, the client will check if the hashed server IP is within this list.
+        If it is, then it will not connect to that server.
 
         Args:
             raw_hashes (bool): If the hashes should not be converted into a _hashlib.HASH object.
@@ -209,6 +210,8 @@ class MojangApi:
         """
         if len(metrics) == 0:
             raise ApiException("You must provide at least one metric!")
+        if isinstance(metrics, str):
+            metrics = [metrics, ]
         for metric in metrics:
             if metric not in Statistics.VALID_METRICS:
                 raise InvalidMetric(f"{metric} is not a valid metric!")

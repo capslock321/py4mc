@@ -36,7 +36,7 @@ class Dispatch:
                 elif not cls._find_problems(response.json()):
                     return response.json()
             else:
-                return response.text
+                return response
         elif response.status_code >= 500:
             raise InternalServerException("A status code greater than 500 was received.")
         return response  # If we don't understand the response returned.
