@@ -29,6 +29,7 @@ class Profile:
         signature (str): The request signature.
 
     """
+
     def __init__(self, profile_value: str, signature: str):
         self.profile = self._process_value(profile_value)
         self.uuid = UUID(self.profile.get("profileId"), version=4)
@@ -145,6 +146,7 @@ class HistoryIndex:
         is_original (bool): If the name is their original name. Is True if it is their original name.
 
     """
+
     def __init__(self, raw_data: dict):
         self.name = raw_data.get("name")
         self.changed_at = raw_data.get("changedToAt")

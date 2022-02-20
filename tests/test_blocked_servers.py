@@ -5,7 +5,6 @@ mojang = py4mc.MojangApi()
 
 
 class TestBlockedServers:
-
     def test_blocked_servers(self):
         blocked_servers = mojang.get_blocked_servers()
         assert isinstance(blocked_servers, list)

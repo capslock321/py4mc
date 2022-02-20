@@ -3,8 +3,8 @@ import requests
 from typing import Union
 from requests import Response
 
-from .utils.checks import is_valid_json
-from .exceptions import InternalServerException, ApiException
+from utils.checks import is_valid_json
+from exceptions import InternalServerException, ApiException
 
 
 class Dispatch:
@@ -15,7 +15,7 @@ class Dispatch:
     def do_request(cls, method: str, route: str, **kwargs):
         if kwargs.get("headers") is None:
             kwargs["headers"] = {"Content-Type": "application/json"}
-        else:
+        elif kwargs["headers"].get("Content-Type") is None:
             kwargs["headers"].update({"Content-Type": "application/json"})
         response = requests.request(method, route, **kwargs)
         return cls.parse_response(response)
@@ -23,8 +23,12 @@ class Dispatch:
     @staticmethod
     def _find_problems(response: dict) -> bool:
         if response.get("error") is not None:
-            exception_format = f"{response.get('error')}: {response.get('errorMessage')}"
-            raise ApiException(f"An exception has occurred while trying to parse the response: {exception_format}")
+            exception_format = (
+                f"{response.get('error')}: {response.get('errorMessage')}"
+            )
+            raise ApiException(
+                f"An exception has occurred while trying to parse the response: {exception_format}"
+            )
         return False
 
     @classmethod
@@ -38,5 +42,7 @@ class Dispatch:
             else:
                 return response
         elif response.status_code >= 500:
-            raise InternalServerException("A status code greater than 500 was received.")
+            raise InternalServerException(
+                "A status code greater than 500 was received."
+            )
         return response  # If we don't understand the response returned.

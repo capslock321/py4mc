@@ -12,7 +12,6 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 class TestProfiles:
-
     def test_single_profile(self):
         profile = mojang.get_profile("capslock321")
         assert profile is not None

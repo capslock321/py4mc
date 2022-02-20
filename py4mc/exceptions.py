@@ -20,3 +20,7 @@ class Ratelimited(ApiException):
 
 class InvalidMetric(ApiException):
     pass
+
+
+class AuthenticationException(ApiException):
+    pass

@@ -8,7 +8,6 @@ mojang = py4mc.MojangApi()
 
 
 class TestStatistics:
-
     def test_statistics(self):
         metrics = ["item_sold_minecraft", "prepaid_card_redeemed_minecraft"]
         statistics = mojang.get_statistics(metrics)

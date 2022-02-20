@@ -79,7 +79,7 @@ class MojangApi:
 
         """
         for iteration in range(0, len(usernames), chunk_size):
-            yield usernames[iteration: iteration + chunk_size]
+            yield usernames[iteration : iteration + chunk_size]
 
     def get_uuid(self, username: str) -> Union[bool, str]:
         """Gets the uuid of the given username.
@@ -121,7 +121,9 @@ class MojangApi:
             processed_uuids.extend([r.get("id") for r in response])
         return processed_uuids
 
-    def _postprocess_profiles(self, profiles: Union[str, Iterable]) -> Union[Profile, list, bool]:
+    def _postprocess_profiles(
+        self, profiles: Union[str, Iterable]
+    ) -> Union[Profile, list, bool]:
         """Processes the profiles before returning.
 
         If there are no profiles, then None is returned. However, if
@@ -160,7 +162,9 @@ class MojangApi:
         """
         retrieved_profiles = []
         if isinstance(profiles, str):
-            profiles = [profiles, ]
+            profiles = [
+                profiles,
+            ]
         for profile in profiles:
             if not is_valid_uuid(profile):
                 profile = self.get_uuid(profile)
@@ -211,7 +215,9 @@ class MojangApi:
         if len(metrics) == 0:
             raise ApiException("You must provide at least one metric!")
         if isinstance(metrics, str):
-            metrics = [metrics, ]
+            metrics = [
+                metrics,
+            ]
         for metric in metrics:
             if metric not in Statistics.VALID_METRICS:
                 raise InvalidMetric(f"{metric} is not a valid metric!")
