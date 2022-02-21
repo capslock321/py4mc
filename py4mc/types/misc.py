@@ -28,3 +28,24 @@ class Statistics:
     def __repr__(self):
         arguments = [f"{k}={v}" for k, v in self.__dict__.items()]
         return "<Statistics {}>".format(" ".join(arguments))
+
+
+class AccountAttributes:
+
+    def __init__(self, raw_data: dict):
+        self.privileges = raw_data.get("privileges")
+        self.online_chat = self._get_is_enabled("onlineChat")
+        self.multiplayer_server = self._get_is_enabled("multiplayerServer")
+        self.multiplayer_realms = self._get_is_enabled("multiplayerRealms")
+        self.telemetry = self._get_is_enabled("telemetry")
+        self.profanity_filter = raw_data['profanityFilterPreferences'].get("profanityFilterOn")
+
+    def __repr__(self):
+        arguments = [f"{k}={v}" for k, v in self.__dict__.items()]
+        return "<AccountAttributes {}>".format(" ".join(arguments))
+
+    def _get_is_enabled(self, value: str):
+        privilege_value = self.privileges.get(value)
+        if privilege_value is not None:
+            return privilege_value.get("enabled")
+        return False

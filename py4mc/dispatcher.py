@@ -3,13 +3,14 @@ import requests
 from typing import Union
 from requests import Response
 
-from utils.checks import is_valid_json
-from exceptions import InternalServerException, ApiException
+from .utils.checks import is_valid_json
+from .exceptions import InternalServerException, ApiException
 
 
 class Dispatch:
     API_BASE = "https://api.mojang.com"
     SESSION_SERVER = "https://sessionserver.mojang.com"
+    SERVICE_URL = "https://api.minecraftservices.com"
 
     @classmethod
     def do_request(cls, method: str, route: str, **kwargs):
