@@ -27,15 +27,17 @@ SOFTWARE.
 import hashlib
 import requests
 
-from typing import Union
+from typing import Union, Optional
 from requests import Response
 from collections.abc import Iterable
 
-from .exceptions import ApiException, InvalidMetric
+from .exceptions import ApiException, InvalidMetric, AuthenticationException
+from .authentication import MicrosoftOAuth, MinecraftAuthentication
 from .utils.checks import is_valid_uuid, is_valid_name
 from .dispatcher import Dispatch
 
 from .types.profile import Profile
+from .types.account import Account
 from .types.misc import Statistics
 
 
@@ -232,3 +234,22 @@ class MojangApi:
         Check the get_user method for extended documentation.
         """
         return self.get_user(profiles)
+
+    def get_account(
+        self,
+        client_id: str,
+        redirect_uri: Optional[str] = "https://localhost",
+        state: Optional[str] = None,
+        open_webbrowser: Optional[bool] = False,
+        code: Optional[str] = None,
+        access_token: Optional[str] = None
+    ):  # Add automatic wgsi server to get code using http.server. Maybe find better way to get account?
+        if access_token is not None:
+            return Account(access_token)
+        microsoft_oauth = MicrosoftOAuth(client_id, redirect_uri)
+        if code is None:
+            return microsoft_oauth.build_url(state, open_webbrowser)
+        oauth_token = microsoft_oauth.get_oauth_token(code)
+        xbl_token = MinecraftAuthentication.get_xbl_token(oauth_token)
+        xsts_token, user_hash = MinecraftAuthentication.get_xsts_token(xbl_token)
+        return Account(MinecraftAuthentication.get_access_token(xsts_token, user_hash))

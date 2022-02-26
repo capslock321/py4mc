@@ -31,14 +31,15 @@ class Statistics:
 
 
 class AccountAttributes:
-
     def __init__(self, raw_data: dict):
         self.privileges = raw_data.get("privileges")
         self.online_chat = self._get_is_enabled("onlineChat")
         self.multiplayer_server = self._get_is_enabled("multiplayerServer")
         self.multiplayer_realms = self._get_is_enabled("multiplayerRealms")
         self.telemetry = self._get_is_enabled("telemetry")
-        self.profanity_filter = raw_data['profanityFilterPreferences'].get("profanityFilterOn")
+        self.profanity_filter = raw_data["profanityFilterPreferences"].get(
+            "profanityFilterOn"
+        )
 
     def __repr__(self):
         arguments = [f"{k}={v}" for k, v in self.__dict__.items()]
