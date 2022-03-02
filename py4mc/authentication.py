@@ -29,7 +29,7 @@ class MicrosoftOAuth:  # Add refresh token
             webbrowser.open(oauth_code_url)
         return oauth_code_url
 
-    def get_oauth_token(self, code: str):
+    def preform_oauth(self, code: str, refresh_token: bool = False):
         payload_arguments = {
             "client_id": self.client_id,
             "code": code,
@@ -42,7 +42,12 @@ class MicrosoftOAuth:  # Add refresh token
         )
         if not isinstance(response, dict):
             raise AuthenticationException(response.json().get("error_description"))
-        return response.get("access_token")
+        if not refresh_token:
+            return response.get("access_token")
+        return response.get("access_token"), response.get("refresh_token")
+
+    def refresh_token(self, refresh_token: str):
+        pass
 
 
 class MinecraftAuthentication:

@@ -27,7 +27,7 @@ class Statistics:
 
     def __repr__(self):
         arguments = [f"{k}={v}" for k, v in self.__dict__.items()]
-        return "<Statistics {}>".format(" ".join(arguments))
+        return "<{} {}>".format(self.__class__.__name__, " ".join(arguments))
 
 
 class AccountAttributes:
@@ -43,7 +43,7 @@ class AccountAttributes:
 
     def __repr__(self):
         arguments = [f"{k}={v}" for k, v in self.__dict__.items()]
-        return "<AccountAttributes {}>".format(" ".join(arguments))
+        return "<{} {}>".format(self.__class__.__name__, " ".join(arguments))
 
     def _get_is_enabled(self, value: str):
         privilege_value = self.privileges.get(value)

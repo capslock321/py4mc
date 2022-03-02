@@ -32,7 +32,7 @@ class Profile:
 
     def __init__(self, profile_value: str, signature: str):
         self.profile = self._process_value(profile_value)
-        self.uuid = UUID(self.profile.get("profileId"), version=4)
+        self.uuid = UUID(self.profile.get("profileId"), version = 4)
         self.username = self.profile.get("profileName")
         self.timestamp = self.get_timestamp()
         self.signature = signature
@@ -42,7 +42,12 @@ class Profile:
 
     def __repr__(self):
         arguments = [f"{k}={v}" for k, v in self.__dict__.items()]
-        return "<Profile {}>".format(" ".join(arguments))
+        return "<{} {}>".format(self.__class__.__name__, " ".join(arguments))
+
+    def __eq__(self, other: object):
+        if type(self) != type(other):
+            return False
+        return self.uuid == other.uuid
 
     def get_timestamp(self) -> datetime:
         """Gets the timestamp of the request.
@@ -159,4 +164,4 @@ class HistoryIndex:
 
     def __repr__(self):
         arguments = [f"{k}={v}" for k, v in self.__dict__.items()]
-        return "<HistoryIndex {}>".format(" ".join(arguments))
+        return "<{} {}>".format(self.__class__.__name__, " ".join(arguments))

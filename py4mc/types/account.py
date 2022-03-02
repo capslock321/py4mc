@@ -31,3 +31,10 @@ class Account:
         route = f"{Dispatch.SERVICE_URL}/player/attributes"
         response = self.auth_request("GET", route)
         return AccountAttributes(response)
+
+    def from_code(self, code: str):
+        pass
+
+    def from_token(self, access_token: str):
+        pass
+
